@@ -5,3 +5,6 @@ Revision history for Perl extension Convert::SciEng.
 
 0.90  Thu Apr 9 1998
 	- Improved, tested, documented
+
+0.91  Thu Aug 28, 2003
+	- Added suffixes for bytes, K M G T 

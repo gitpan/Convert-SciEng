@@ -6,22 +6,26 @@ use Carp;
 
 require 5.004_04;      ##Last standard version of Perl that I use
 
-$VERSION = '0.90';
+$VERSION = '0.91';
 
 # Preloaded methods go here.
 
 ##Begin forming the lookup hashes using arrays
-my @SP_Postfixs = qw(   P    T   g   x   k        m    u    n     p     f     a);
-my @SI_Postfixs = qw(   P    T   G   M   K        m    u    n     p     f     a);
-my @factors     = qw(1e15 1e12 1e9 1e6 1e3 1e0 1e-3 1e-6 1e-9 1e-12 1e-15 1e-18);
+my @SP_Postfixs = qw(   P    T    g    x    k        m    u    n     p     f     a);
+my @SI_Postfixs = qw(   P    T    G    M    K        m    u    n     p     f     a);
+my @factors     = qw(1e15 1e12  1e9  1e6  1e3 1e0 1e-3 1e-6 1e-9 1e-12 1e-15 1e-18);
+my @CS_Postfixs = qw(    P     T     G     M     K     );
+my @CS_factors  =   (2**50,2**40,2**30,2**20,2**10,2**0);
 
 ##Form the regexp for extracting the suffixes
 my $SP_Suffixes = join '','[',@SP_Postfixs,']';
 my $SI_Suffixes = join '','[',@SI_Postfixs,']';
+my $CS_Suffixes = join '','[',@CS_Postfixs,']';
 
 ##Add the null index for unity
 splice (@SP_Postfixs,5,0,'');
 splice (@SI_Postfixs,5,0,'');
+push   (@CS_Postfixs,   ,'');
 
 ##Form the lookup hashes
 my %SP_Postfixs;
@@ -29,6 +33,9 @@ my %SP_Postfixs;
 
 my %SI_Postfixs;
 @SI_Postfixs{@SI_Postfixs} = @factors;
+
+my %CS_Postfixs;
+@CS_Postfixs{@CS_Postfixs} = @CS_factors;
 
 sub new {
   my $proto = shift;
@@ -45,6 +52,11 @@ sub new {
     $self->{'_SUFFIX'} = $SI_Suffixes;
     $self->{'_FACTORS'}  = \%SI_Postfixs;
     $self->{'_POSTFIXS'}  = \@SI_Postfixs;
+  }
+  elsif ($mode eq 'cs') {
+    $self->{'_SUFFIX'} = $CS_Suffixes;
+    $self->{'_FACTORS'}  = \%CS_Postfixs;
+    $self->{'_POSTFIXS'}  = \@CS_Postfixs;
   }
   else {
     croak "Unrecoginized mode: $mode\n";
@@ -135,18 +147,18 @@ Convert::SciEng - Convert 'numbers' with scientific postfixes
 
 perl5.004_04 or greater, Carp
 
-I'm sorry if you get bit by the 5.004_04 but I believe in the
-Cathedral model.  Keep current or suffer the penalties.
-
 =head1 DESCRIPTION
 
 Convert::SciEng supplies an object for converting numbers to and from
-scientific notation with user-defined formatting.  Two different styles
-of fix are supported, standard SI and SPICE:
+scientific notation with user-defined formatting.  Three different styles
+of fix are supported, standard CS, SI and SPICE:
 
- SPICE  =    P    T   g   x   k  ''    m    u    n     p     f     a
- SI     =    P    T   G   M   K  ''    m    u    n     p     f     a
- Fix    = 1e15 1e12 1e9 1e6 1e3 1e0 1e-3 1e-6 1e-9 1e-12 1e-15 1e-18
+ SPICE  =    P    T    g    x    k   ''    m    u    n     p     f     a
+ SI     =    P    T    G    M    K   ''    m    u    n     p     f     a
+ Fix    = 1e15 1e12  1e9  1e6  1e3  1e0 1e-3 1e-6 1e-9 1e-12 1e-15 1e-18
+
+ CS     =    P    T    G    M    K   ''
+ Fix    = 2^50 2^40 2^30 2^20 2^10  2^0
 
 Methods are supplied for creating the object and defining which fix style
 it will use, and defining for format of numbers as they are converted to
@@ -161,7 +173,7 @@ scientific notation.
 =item Convert::SciEng->new('style');
 
 Creates and returns a new Number::SI object of the appropiate style,
-either C<'si'> or C<'spice'>. The styles aren't case sensitive
+C<'cs'> or C<'si'> or C<'spice'>. The styles aren't case sensitive
 
 =item $fix->format(FORMAT);
 
@@ -214,7 +226,7 @@ C</^\%\d+(\.\d+)?([scduxoefg]|l[duxo])$/>
 
 =head1 AUTHOR
 
-Colin Kuskie, colink@latticesemi.com
+Colin Kuskie, ckuskie@cpan.org
 
 =head1 KUDOS
 

@@ -20,10 +20,12 @@ numbers as postfix scale factors are added (number to string
 conversion), and provides functions for converting from string to
 numbers. (See the module documentation for details).
 
-Two different styles of postfixes are supported, SPICE and SI.  The
-main difference between the two is the capatilization of the postfixes
+Three different styles of postfixes are supported, SPICE, SI, and CS.  The
+main difference between the first two is the capatilization of the postfixes
 for all fixes greater than one, ie kilo, mega, and so on.  A list of
-the abbreviations can be found in the module documentation.
+the abbreviations can be found in the module documentation.  The third
+format, CS, refers to "computer science" and is used to format numbers
+based on powers of two, rather than ten.
 
 The format of numbers as they are converted from strings can
 be set by the user to be any valid format to sprintf.  This is
